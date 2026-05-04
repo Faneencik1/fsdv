@@ -35,6 +35,31 @@ async def is_admin(update: Update) -> bool:
     """Проверяет, является ли пользователь администратором"""
     return update.effective_user.id == ADMIN_ID
 
+async def send_with_custom_emoji(context: ContextTypes.DEFAULT_TYPE, chat_id: int, text: str, emoji_id: str = None) -> None:
+    """
+    Отправляет сообщение с кастомным эмодзи
+    Кастомные эмодзи работают только для Premium пользователей
+    """
+    try:
+        if emoji_id:
+            # Для inline кастомных эмодзи используем MessageEntity
+            await context.bot.send_message(
+                chat_id=chat_id,
+                text=text,
+                entities=[{
+                    "type": "custom_emoji",
+                    "offset": 0,  # позиция в тексте где начинается эмодзи
+                    "length": 1,   # длина эмодзи (обычно 1)
+                    "custom_emoji_id": emoji_id
+                }]
+            )
+        else:
+            await context.bot.send_message(chat_id=chat_id, text=text)
+    except Exception as e:
+        logger.error(f"Ошибка при отправке кастомного эмодзи: {e}")
+        # Отправляем без кастомного эмодзи в случае ошибки
+        await context.bot.send_message(chat_id=chat_id, text=text)
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     logger.info(f"Пользователь @{user.username} (ID: {user.id}) запустил бота.")
