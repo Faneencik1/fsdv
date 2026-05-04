@@ -63,10 +63,15 @@ async def send_with_custom_emoji(context: ContextTypes.DEFAULT_TYPE, chat_id: in
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     logger.info(f"Пользователь @{user.username} (ID: {user.id}) запустил бота.")
-    await update.message.reply_text(
-        "{get_custom_emoji_text('welcome')} Привет! Напиши своё сообщение сюда, и оно опубликуется в канале (имя канала).\n"
-        "Бот был сделан: @faneencikmusic"
-    )
+    
+    text = " Привет! Напиши своё сообщение сюда, и оно опубликуется в канале.\nБот был сделан: @faneencikmusic"
+    emoji_id = CUSTOM_EMOJI_IDS.get("welcome")
+    
+    if emoji_id:
+        # Отправляем эмодзи + текст
+        await send_with_custom_emoji(context, update.effective_chat.id, text, emoji_id, 0)
+    else:
+        await update.message.reply_text("👋 Привет! Напиши своё сообщение сюда, и оно опубликуется в канале.\nБот был сделан: @faneencikmusic")
 
 async def forward_media_group(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
