@@ -23,6 +23,14 @@ ADMIN_ID = int(os.getenv("ADMIN_ID"))
 PORT = int(os.environ.get('PORT', 5000))  # Для Render
 WEBHOOK_URL = os.getenv("WEBHOOK_URL", "")  # Для webhook
 
+# ID кастомных эмодзи из вашего эмодзи-пака (замените на свои)
+CUSTOM_EMOJIS = {
+    "success": "5208880351690112495",      # ID кастомного эмодзи для успеха
+    "error": "5352703271536454445",        # ID для ошибки
+    "welcome": "5341463333532882949",      # ID для приветствия
+    "warning": "5447644880824181073",      # ID для предупреждения
+}
+
 async def is_admin(update: Update) -> bool:
     """Проверяет, является ли пользователь администратором"""
     return update.effective_user.id == ADMIN_ID
@@ -31,7 +39,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     logger.info(f"Пользователь @{user.username} (ID: {user.id}) запустил бота.")
     await update.message.reply_text(
-        "👋 Привет! Напиши своё сообщение сюда, и оно опубликуется в канале (имя канала).\n"
+        "{get_custom_emoji_text('welcome')} Привет! Напиши своё сообщение сюда, и оно опубликуется в канале (имя канала).\n"
         "Бот был сделан: @faneencikmusic"
     )
 
@@ -83,7 +91,7 @@ async def forward_media_group(update: Update, context: ContextTypes.DEFAULT_TYPE
                 caption=update.message.caption
             )
             logger.info(f"Голосовое сообщение от @{user.username}")
-            await update.message.reply_text("✅ Ваше голосовое сообщение переслано!")
+            await update.message.reply_text("{get_custom_emoji_text('success')} Ваше голосовое сообщение переслано!")
             return
 
         # Обработка медиагрупп (альбомов)
@@ -100,12 +108,12 @@ async def forward_media_group(update: Update, context: ContextTypes.DEFAULT_TYPE
             context.user_data.pop('media_group', None)
             context.user_data.pop('caption', None)
             
-        await update.message.reply_text("✅ Медиа пересланы!")
+        await update.message.reply_text("{get_custom_emoji_text('success')} Медиа пересланы!")
         logger.info(f"Медиа от @{user.username} (ID: {user.id})")
 
     except Exception as e:
         logger.error(f"Ошибка пересылки медиа: {e}")
-        await update.message.reply_text("⚠️ Произошла ошибка при пересылке медиа")
+        await update.message.reply_text("{get_custom_emoji_text('warning')} Произошла ошибка при пересылке медиа")
 
 async def forward_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
@@ -122,13 +130,13 @@ async def forward_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             chat_id=ADMIN_ID,
             text=text
         )
-        await update.message.reply_text("✅ Ваше сообщение было переслано!")
+        await update.message.reply_text("{get_custom_emoji_text('success')} Ваше сообщение было переслано!")
     except Exception as e:
         logger.error(f"Ошибка отправки: {e}")
 
 async def get_log(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not await is_admin(update):
-        await update.message.reply_text("❌ У вас нет прав для выполнения этой команды.")
+        await update.message.reply_text("{get_custom_emoji_text('error')} У вас нет прав для выполнения этой команды.")
         return
 
     try:
@@ -140,10 +148,10 @@ async def get_log(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             )
         logger.info(f"Администратор @{update.effective_user.username} запросил лог-файл")
     except FileNotFoundError:
-        await update.message.reply_text("⚠️ Лог-файл не найден")
+        await update.message.reply_text("{get_custom_emoji_text('warning')} Лог-файл не найден")
     except Exception as e:
         logger.error(f"Ошибка отправки лога: {e}")
-        await update.message.reply_text("⚠️ Произошла ошибка при отправке лога")
+        await update.message.reply_text("{get_custom_emoji_text('warning')} Произошла ошибка при отправке лога")
 
 def main() -> None:
     app = Application.builder().token(BOT_TOKEN).build()
