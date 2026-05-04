@@ -31,12 +31,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     logger.info(f"Пользователь @{user.username} (ID: {user.id}) запустил бота.")
     await update.message.reply_text(
-        "👋 Привет! Я могу пересылать:\n"
-        "- Текстовые сообщения\n"
-        "- Фотографии (включая альбомы)\n"
-        "- Видео\n"
-        "- Голосовые сообщения\n\n"
-        "Просто отправь мне что-нибудь!"
+        "👋 Привет! Напиши своё сообщение сюда, и оно опубликуется в канале (имя канала).\n"
+        "Бот был сделан: @faneencikmusic"
     )
 
 async def forward_media_group(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -104,7 +100,7 @@ async def forward_media_group(update: Update, context: ContextTypes.DEFAULT_TYPE
             context.user_data.pop('media_group', None)
             context.user_data.pop('caption', None)
             
-        await update.message.reply_text("✅ Ваши медиафайлы пересланы!")
+        await update.message.reply_text("✅ Медиа пересланы!")
         logger.info(f"Медиа от @{user.username} (ID: {user.id})")
 
     except Exception as e:
